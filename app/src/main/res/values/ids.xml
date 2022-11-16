@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="put_name" type="id" />
+    <item name="put_phone" type="id" />
+    <item name="put_id" type="id" />
+    <item name="put_password" type="id" />
+    <item name="checkbox1" type="id" />
+    <item name="checkbox" type="id" />
+    <item name="checkbox2" type="id" />
+    <item name="checkbox3" type="id" />
+    <item name="friend1" type="id" />
+</resources>
