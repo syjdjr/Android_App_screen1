@@ -1,0 +1,114 @@
+package com.example.teamproject;
+
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.speech.RecognizerIntent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+
+public class map extends AppCompatActivity implements View.OnClickListener {
+    public Button mapBtn;
+
+    private Textview resultView;
+    private ImageView resultImageView;
+    private File filePath;
+    private int reqWidth;
+    private int reqHeight;
+    private View browserBtn;
+
+    //지도 기능
+    @Override
+    protected void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_map);
+
+        mapBtn = findViewById(R.id.mapView);
+        mapBtn.setOnClickListener(this);
+        reqWidth=getResources().getDimensionPixelSize(R.dimen.request_image_width);
+        reqHeight=getResources().getDimensionPixelSize(R.dimen.request_image_height);
+
+        // fragment 없어도 되는데 나중을 대비해서 넣음 -> 문제 없으면 삭제 할것임
+        SupportMapFragment mapFragment =(SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    public void onClick(View view){
+        if(view == mapBtn){
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("geo:37.5662952,126.9779451"));
+            startActivity(intent);
+        }else if(view == browserBtn){
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.seoul.go.kr"));
+        }
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 10 && resultCode == RESULT_OK) {
+            String result = data.getDataString();
+            resultView.setText(result);
+        } else if (requestCode == 30 && resultCode == RESULT_OK) {
+            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+            resultImageView.setImageBitmap(bitmap);
+        } else if (requestCode == 40 && resultCode == RESULT_OK) {
+            if (filePath != null) {
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true; // to avoid memory allocation for the bitmap object
+                try {
+                    InputStream in = new FileInputStream(filePath);
+                    BitmapFactory.decodeStream(in, null, options);
+                    in.close();
+                } catch (Exception e) { e.printStackTrace(); }
+                final int height = options.outHeight;
+                final int width = options.outWidth;
+                int inSampleSize = 1;
+                if (height > reqHeight || width > reqWidth) {
+                    final int heightRatio = Math.round((float) height / (float) reqHeight);
+                    final int widthRatio = Math.round((float) width / (float) reqWidth);
+                    inSampleSize = Math.max(heightRatio, widthRatio);
+                }
+                BitmapFactory.Options imgOptions = new BitmapFactory.Options();
+                imgOptions.inSampleSize = inSampleSize; // 1/inSampleSize
+                Bitmap bitmap = BitmapFactory.decodeFile(filePath.getAbsolutePath(), imgOptions);
+                resultImageView.setImageBitmap(bitmap);
+            }
+        } else if (requestCode == 50 && resultCode == RESULT_OK) {
+            ArrayList<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            String result = results.get(0);
+            resultView.setText(result);
+        }
+    }
+    // 인스타그램 검색 기능
+
+    @Override
+    public <T extends View> T findViewById(int id) {
+         super.findViewById(id);
+
+         insta = findViewById(R.id.insta)
+
+
+    }
+}
+}
+
+
+
